@@ -1,0 +1,22 @@
+# Game executable (copyrighted)
+*.exe
+# But keep the launcher
+!tools/Leaderboard Mod Launcher.exe
+
+# Steam API (proprietary)
+steam_api64.dll
+libgodotsteam.*.dll
+
+# PCK files (encrypted, contains copyrighted assets)
+*.pck
+*.pck.orig
+
+# Godot editor artifacts (keep exported scenes)
+.godot/imported/
+.godot/global_script_class_cache.cfg
+
+# OS junk
+*.orig
+*.bak
+Thumbs.db
+.DS_Store
