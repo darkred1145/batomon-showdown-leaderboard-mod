@@ -166,15 +166,15 @@ func _show_user_stats():
 		rank_summary_label.visible = true
 		return
 
-	var name_display := user.display_name
+	var name_display = user.display_name
 	if name_display == "":
 		name_display = "Player"
 
-	var tier_id := user.rank_tier
-	var tier_label := TIER_LABELS.get(tier_id, tier_id.capitalize())
-	var tier_color := TIER_COLORS.get(tier_id, Color(0, 0, 0))
-	var sub := user.rank_sub
-	var stars := user.rank_stars
+	var tier_id = user.rank_tier
+	var tier_label = TIER_LABELS.get(tier_id, tier_id.capitalize())
+	var tier_color = TIER_COLORS.get(tier_id, Color(0, 0, 0))
+	var sub = user.rank_sub
+	var stars = user.rank_stars
 
 	if tier_id == "master":
 		rank_summary_label.text = "%s — Master (MMR: %d)" % [name_display, user.ranked_mmr]

@@ -1,0 +1,140 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://game/ui/common/leaderboard_panel.gd" id="1_lhmqi"]
+[ext_resource type="Texture2D" path="res://assets/ui/textures/dex/trophy_icon.png" id="2_fq0pa"]
+[ext_resource type="PackedScene" path="res://game/ui/common/menu_button.tscn" id="3_7xdtn"]
+
+[sub_resource type="Animation" id="1"]
+resource_name = "show"
+length = 0.3
+tracks/0/type = &"value"
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"values": [Vector2(0, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="2"]
+resource_name = "hide"
+length = 0.2
+tracks/0/type = &"value"
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"values": [Vector2(1, 1), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="3"]
+_data = {
+"show": SubResource("1"),
+"hide": SubResource("2")
+}
+
+[node name="LeaderboardPanel" type="PanelContainer"]
+script = ExtResource("1_lhmqi")
+anchors_preset = -1
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+
+[node name="margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="vbox" type="VBoxContainer" parent="margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="trophy_holder" type="CenterContainer" parent="margin/vbox"]
+layout_mode = 2
+
+[node name="trophy" type="TextureRect" parent="margin/vbox/trophy_holder"]
+layout_mode = 2
+texture = ExtResource("2_fq0pa")
+custom_minimum_size = Vector2(32, 32)
+expand_mode = 2
+stretch_mode = 5
+
+[node name="title_label" type="Label" parent="margin/vbox"]
+layout_mode = 2
+text = "Leaderboard"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0, 0, 0)
+
+[node name="sep1" type="HSeparator" parent="margin/vbox"]
+layout_mode = 2
+
+[node name="rank_summary_label" type="Label" parent="margin/vbox"]
+layout_mode = 2
+visible = false
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0, 0, 0)
+
+[node name="stats_label" type="Label" parent="margin/vbox"]
+layout_mode = 2
+visible = false
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3)
+
+[node name="sep2" type="HSeparator" parent="margin/vbox"]
+layout_mode = 2
+
+[node name="leaderboard_header" type="Label" parent="margin/vbox"]
+layout_mode = 2
+text = "Master Tier Rankings"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0, 0, 0)
+
+[node name="scroll_container" type="ScrollContainer" parent="margin/vbox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="list_container" type="VBoxContainer" parent="margin/vbox/scroll_container"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="loading_label" type="Label" parent="margin/vbox/scroll_container/list_container"]
+layout_mode = 2
+text = "Loading..."
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0, 0, 0)
+
+[node name="local_note" type="Label" parent="margin/vbox/scroll_container/list_container"]
+layout_mode = 2
+visible = false
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6)
+
+[node name="sep3" type="HSeparator" parent="margin/vbox"]
+layout_mode = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("3")
+}
+
+[node name="done_button" parent="margin/vbox" instance=ExtResource("3_7xdtn")]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Done"
