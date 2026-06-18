@@ -1,44 +1,65 @@
 # Batomon Showdown — Leaderboard Mod
 
-Adds a centered leaderboard overlay to the title screen (placeholder/mock data).
+Adds a leaderboard panel to the title screen showing your ranked tier, MMR, win rate, and the Master-tier leaderboard fetched from the game's backend.
 
 ## Requirements
 
 - [Batomon Showdown Demo](https://store.steampowered.com/app/4557380) installed on Steam
 - Windows 7+ (.NET Framework 4.x built-in)
+- Some GPUs need `--rendering-driver opengl3` (the included launcher handles this)
 
 ## Installation
 
-1. Download the latest `Leaderboard Mod Installer.exe` from [Releases](https://github.com/darkred1145/batomon-showdown-leaderboard-mod/releases)
-2. Place it anywhere (keep `batomon_showdown.pck` next to it)
-3. Run `Leaderboard Mod Installer.exe` — it creates `Desktop\Batomon Showdown Leaderboard\`
+1. Download `Leaderboard Mod Installer.exe` and `batomon_showdown.pck` from [Releases](https://github.com/darkred1145/batomon-showdown-leaderboard-mod/releases)
+2. Place both in the same folder, run the installer
+3. It creates `Desktop\Batomon Showdown Leaderboard\` with a portable copy
 4. Launch from `Desktop\Batomon Showdown Leaderboard\Leaderboard Mod Launcher.exe`
 
 The original Steam install is never modified.
 
 ## Building from source
 
-You'll need:
-- [GodotPCKExplorer](https://github.com/ValveSoftware/GodotPCKExplorer) for PCK patching
-- The PCK encryption key (extracted from `batomon_showdown.exe`)
+```powershell
+# One-time: back up the original PCK
+copy "$gameDir\batomon_showdown.pck" "$gameDir\batomon_showdown.pck.orig"
 
-See `tools/build_mod.ps1` for the automated build process.
+# Build
+.\tools\build_mod.ps1
+```
+
+Requires [GodotPCKExplorer](https://github.com/ValveSoftware/GodotPCKExplorer) (included at `_tools/pckexplorer/` after installing the demo).
 
 ## Project structure
 
 ```
 ├── src/
-│   ├── game/ui/common/leaderboard_panel.gd    # Main panel logic
-│   ├── game/states/title_state.gd             # Modified title state
-│   ├── .godot/exported/.../*.scn              # Compiled scene
-│   └── *.tscn.remap                           # Scene redirect files
+│   ├── game/
+│   │   ├── states/
+│   │   │   ├── title_state.gd               # Adds Leaderboard button to title
+│   │   │   └── title_state.tscn.remap        # Scene redirect
+│   │   └── ui/common/
+│   │       ├── leaderboard_panel.gd          # Panel logic, layout, leaderboard fetch
+│   │       ├── leaderboard_panel.tscn        # Scene source (Godot editor)
+│   │       └── leaderboard_panel.tscn.remap  # Scene redirect
+│   └── .godot/exported/.../
+│       └── export-*leaderboard_panel.scn     # Compiled scene
 ├── tools/
-│   ├── installer_source.cs                    # Installer EXE source
-│   ├── launcher_source.cs                     # Game launcher EXE source
-│   └── build_mod.ps1                          # Automated build script
+│   ├── installer_source.cs                   # Installer EXE (C#)
+│   ├── launcher_source.cs                    # Game launcher EXE (C#)
+│   ├── Leaderboard Mod Launcher.exe          # Pre-built launcher
+│   └── build_mod.ps1                         # PCK build script
 ├── .gitignore
-└── LICENSE
+├── LICENSE
+└── README.md
 ```
+
+## Features
+
+- **Leaderboard button** on the title screen
+- **User stats**: ranked tier, division, stars, MMR, win rate
+- **Master-tier leaderboard**: top 200 players sorted by MMR
+- **Animations**: fade-in/fade-out
+- **Non-invasive**: standalone copy, original game untouched
 
 ## License
 
