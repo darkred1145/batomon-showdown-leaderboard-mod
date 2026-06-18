@@ -5,12 +5,27 @@ signal close_requested
 
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
 
+const TIER_LABELS := {
+	"bronze": "Bronze", "silver": "Silver", "gold": "Gold",
+	"platinum": "Platinum", "diamond": "Diamond", "master": "Master",
+}
+const TIER_COLORS := {
+	"bronze": Color(0.8, 0.5, 0.2),
+	"silver": Color(0.7, 0.7, 0.75),
+	"gold": Color(1.0, 0.84, 0.0),
+	"platinum": Color(0.4, 0.9, 0.85),
+	"diamond": Color(0.3, 0.6, 1.0),
+	"master": Color(1.0, 0.3, 0.3),
+}
+
 var title_label: Label
-var your_rank_label: Label
+var rank_summary_label: Label
+var stats_label: Label
+var leaderboard_header: Label
 var scroll_container: ScrollContainer
 var list_container: VBoxContainer
 var loading_label: Label
-var error_label: Label
+var local_note: Label
 var done_button: Button
 
 const TROPHY_ICON := preload("res://assets/ui/textures/dex/trophy_icon.png")
@@ -54,11 +69,28 @@ func _ready():
 
 	vbox.add_child(HSeparator.new())
 
-	your_rank_label = Label.new()
-	your_rank_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	your_rank_label.add_theme_font_size_override("font_size", 16)
-	your_rank_label.add_theme_color_override("font_color", Color(0, 0, 0))
-	vbox.add_child(your_rank_label)
+	rank_summary_label = Label.new()
+	rank_summary_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rank_summary_label.add_theme_font_size_override("font_size", 16)
+	rank_summary_label.add_theme_color_override("font_color", Color(0, 0, 0))
+	rank_summary_label.visible = false
+	vbox.add_child(rank_summary_label)
+
+	stats_label = Label.new()
+	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stats_label.add_theme_font_size_override("font_size", 14)
+	stats_label.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
+	stats_label.visible = false
+	vbox.add_child(stats_label)
+
+	vbox.add_child(HSeparator.new())
+
+	leaderboard_header = Label.new()
+	leaderboard_header.text = "Master Tier Rankings"
+	leaderboard_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	leaderboard_header.add_theme_font_size_override("font_size", 16)
+	leaderboard_header.add_theme_color_override("font_color", Color(0, 0, 0))
+	vbox.add_child(leaderboard_header)
 
 	scroll_container = ScrollContainer.new()
 	scroll_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -76,11 +108,12 @@ func _ready():
 	loading_label.add_theme_color_override("font_color", Color(0, 0, 0))
 	list_container.add_child(loading_label)
 
-	error_label = Label.new()
-	error_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	error_label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))
-	error_label.visible = false
-	list_container.add_child(error_label)
+	local_note = Label.new()
+	local_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	local_note.add_theme_font_size_override("font_size", 14)
+	local_note.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	local_note.visible = false
+	list_container.add_child(local_note)
 
 	vbox.add_child(HSeparator.new())
 
@@ -107,20 +140,50 @@ func show_leaderboard():
 
 	loading_label.visible = true
 	loading_label.text = "Loading..."
-	error_label.visible = false
+	local_note.visible = false
 
 	for c in list_container.get_children():
-		if c != loading_label and c != error_label:
+		if c != loading_label and c != local_note:
 			list_container.remove_child(c)
 			c.queue_free()
 
-	your_rank_label.text = ""
+	rank_summary_label.visible = false
+	stats_label.visible = false
+
+	_show_user_stats()
 
 	if anim_player.has_animation("show"):
 		anim_player.play("show")
 
 	_fetch_pending = true
 	_start_fetch()
+
+
+func _show_user_stats():
+	var user = UserManager.data
+	if user == null:
+		rank_summary_label.text = "No player data available"
+		rank_summary_label.visible = true
+		return
+
+	var name_display := user.display_name
+	if name_display == "":
+		name_display = "Player"
+
+	var tier_id := user.rank_tier
+	var tier_label := TIER_LABELS.get(tier_id, tier_id.capitalize())
+	var tier_color := TIER_COLORS.get(tier_id, Color(0, 0, 0))
+	var sub := user.rank_sub
+	var stars := user.rank_stars
+
+	if tier_id == "master":
+		rank_summary_label.text = "%s — Master (MMR: %d)" % [name_display, user.ranked_mmr]
+	else:
+		rank_summary_label.text = "%s — %s %d (%d★) — MMR: %d" % [name_display, tier_label, sub, stars, user.ranked_mmr]
+	rank_summary_label.visible = true
+
+	stats_label.text = "Wins: %d  /  Games: %d  —  Win Rate: %d%%" % [user.runs_won, user.games_played, int(float(user.runs_won) / max(user.games_played, 1) * 100)]
+	stats_label.visible = true
 
 
 func _update_position():
@@ -135,8 +198,7 @@ func _update_position():
 func _start_fetch():
 	var provider = RunManager.data_provider
 	if provider == null or not provider.has_method("get_master_leaderboard"):
-		_show_error("Data provider not available")
-		_fetch_pending = false
+		_on_fetch_done([])
 		return
 
 	var timer := get_tree().create_timer(10.0)
@@ -147,26 +209,29 @@ func _start_fetch():
 		return
 	_fetch_pending = false
 	timer.stop()
-
-	loading_label.visible = false
-	if lb.is_empty():
-		_show_error("Could not load leaderboard")
-		return
-	_populate_list(lb)
+	_on_fetch_done(lb)
 
 
 func _on_fetch_timeout():
 	if not _fetch_pending:
 		return
 	_fetch_pending = false
+	_on_fetch_done([])
+
+
+func _on_fetch_done(lb: Array):
 	loading_label.visible = false
-	_show_error("Request timed out")
 
+	if lb.is_empty():
+		leaderboard_header.text = "Master Tier Rankings"
+		local_note.text = "Leaderboard available online in the full game"
+		local_note.visible = true
+		return
 
-func _populate_list(lb: Array):
-	var current_user_id: String = ""
-	if UserManager.data != null and UserManager.data.has("user_id"):
-		current_user_id = UserManager.data["user_id"]
+	var user = UserManager.data
+	var current_user_id := ""
+	if user != null and user.has_method("_get_user_id"):
+		current_user_id = "local_player"
 
 	var my_pos := 0
 	for i in range(lb.size()):
@@ -236,19 +301,7 @@ func _populate_list(lb: Array):
 		list_container.add_child(row)
 
 	if my_pos > 0:
-		your_rank_label.text = "Your Rank: #%d" % my_pos
-	else:
-		var user_mmr = UserManager.data.ranked_mmr if UserManager.data != null else 0
-		if user_mmr > 0:
-			your_rank_label.text = "Your MMR: %d (outside top %d)" % [user_mmr, lb.size()]
-		else:
-			your_rank_label.text = "Complete a ranked run to appear on the leaderboard"
-
-
-func _show_error(msg: String):
-	loading_label.visible = false
-	error_label.text = msg
-	error_label.visible = true
+		leaderboard_header.text = "Master Tier Rankings — Your Position: #%d" % my_pos
 
 
 func _on_done():
