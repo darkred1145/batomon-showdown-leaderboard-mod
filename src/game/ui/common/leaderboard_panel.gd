@@ -28,7 +28,6 @@ var loading_label: Label
 var local_note: Label
 var done_button: Button
 
-const TROPHY_ICON := preload("res://assets/ui/textures/dex/trophy_icon.png")
 const GOLD_ICON := preload("res://assets/ui/textures/ranked/gold_icon.png")
 const SILVER_ICON := preload("res://assets/ui/textures/ranked/silver_icon.png")
 const BRONZE_ICON := preload("res://assets/ui/textures/ranked/bronze_icon.png")
@@ -40,10 +39,10 @@ func _ready():
 	visible = false
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 24)
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_right", 24)
-	margin.add_theme_constant_override("margin_bottom", 16)
+	margin.add_theme_constant_override("margin_left", 16)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_right", 16)
+	margin.add_theme_constant_override("margin_bottom", 8)
 	add_child(margin)
 
 	var vbox := VBoxContainer.new()
@@ -51,19 +50,10 @@ func _ready():
 	vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(vbox)
 
-	var trophy_holder := CenterContainer.new()
-	var trophy := TextureRect.new()
-	trophy.texture = TROPHY_ICON
-	trophy.custom_minimum_size = Vector2(32, 32)
-	trophy.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-	trophy.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	trophy_holder.add_child(trophy)
-	vbox.add_child(trophy_holder)
-
 	title_label = Label.new()
 	title_label.text = "Leaderboard"
 	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 28)
+	title_label.add_theme_font_size_override("font_size", 20)
 	title_label.add_theme_color_override("font_color", Color(0, 0, 0))
 	vbox.add_child(title_label)
 
@@ -71,30 +61,31 @@ func _ready():
 
 	rank_summary_label = Label.new()
 	rank_summary_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	rank_summary_label.add_theme_font_size_override("font_size", 16)
+	rank_summary_label.add_theme_font_size_override("font_size", 12)
 	rank_summary_label.add_theme_color_override("font_color", Color(0, 0, 0))
+	rank_summary_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	rank_summary_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	rank_summary_label.visible = false
 	vbox.add_child(rank_summary_label)
 
 	stats_label = Label.new()
 	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	stats_label.add_theme_font_size_override("font_size", 14)
-	stats_label.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
+	stats_label.add_theme_font_size_override("font_size", 11)
+	stats_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 	stats_label.visible = false
 	vbox.add_child(stats_label)
-
-	vbox.add_child(HSeparator.new())
 
 	leaderboard_header = Label.new()
 	leaderboard_header.text = "Master Tier Rankings"
 	leaderboard_header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	leaderboard_header.add_theme_font_size_override("font_size", 16)
+	leaderboard_header.add_theme_font_size_override("font_size", 13)
 	leaderboard_header.add_theme_color_override("font_color", Color(0, 0, 0))
 	vbox.add_child(leaderboard_header)
 
 	scroll_container = ScrollContainer.new()
 	scroll_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll_container.size_flags_stretch_ratio = 1.0
 	vbox.add_child(scroll_container)
 
 	list_container = VBoxContainer.new()
@@ -189,7 +180,7 @@ func _show_user_stats():
 func _update_position():
 	var vs := get_viewport_rect().size
 	var pw := min(vs.x * 0.85, 640.0)
-	var ph := min(vs.y * 0.85, 600.0)
+	var ph := min(vs.y * 0.88, 700.0)
 	custom_minimum_size = Vector2(pw, 0)
 	size = Vector2(pw, ph)
 	position = Vector2((vs.x - pw) / 2, (vs.y - ph) / 2)
@@ -245,8 +236,8 @@ func _on_fetch_done(lb: Array):
 			my_pos = rank_num
 
 		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		row.custom_minimum_size = Vector2(0, 24)
+		row.add_theme_constant_override("separation", 4)
+		row.custom_minimum_size = Vector2(0, 18)
 
 		var rank_label: Control
 		if rank_num <= 3:
@@ -255,7 +246,7 @@ func _on_fetch_done(lb: Array):
 				1: icon.texture = GOLD_ICON
 				2: icon.texture = SILVER_ICON
 				3: icon.texture = BRONZE_ICON
-			icon.custom_minimum_size = Vector2(22, 22)
+			icon.custom_minimum_size = Vector2(16, 16)
 			icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 			icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
