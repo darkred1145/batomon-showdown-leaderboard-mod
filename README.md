@@ -1,10 +1,6 @@
 # Batomon Showdown — Leaderboard Mod
 
-Adds a centered leaderboard overlay to the title screen.
-
-## What it does
-
-Shows your ranked leaderboard position, win rate, and top entries directly from the title screen — no need to navigate menus.
+Adds a centered leaderboard overlay to the title screen (placeholder/mock data).
 
 ## Requirements
 
