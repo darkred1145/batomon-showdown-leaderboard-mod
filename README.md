@@ -13,7 +13,7 @@ Shows your ranked leaderboard position, win rate, and top entries directly from 
 
 ## Installation
 
-1. Download the latest `Leaderboard Mod Installer.exe` from [Releases](https://github.com/YOUR_USERNAME/batomon-showdown-leaderboard-mod/releases)
+1. Download the latest `Leaderboard Mod Installer.exe` from [Releases](https://github.com/darkred1145/batomon-showdown-leaderboard-mod/releases)
 2. Place it anywhere (keep `batomon_showdown.pck` next to it)
 3. Run `Leaderboard Mod Installer.exe` — it creates `Desktop\Batomon Showdown Leaderboard\`
 4. Launch from `Desktop\Batomon Showdown Leaderboard\Leaderboard Mod Launcher.exe`
