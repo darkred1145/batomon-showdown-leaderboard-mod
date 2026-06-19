@@ -1,5 +1,17 @@
 $gameDir = "C:\Program Files (x86)\Steam\steamapps\common\Batomon Showdown Demo"
-$pckKey = "YOUR_PCK_KEY_HERE"
+$envFile = "$PSScriptRoot\..\.env"
+if (Test-Path $envFile) {
+    $envVars = Get-Content $envFile | Where-Object { $_ -match "=" }
+    foreach ($line in $envVars) {
+        $kv = $line -split "=", 2
+        Set-Item -Path "env:$($kv[0].Trim())" -Value $kv[1].Trim()
+    }
+}
+$pckKey = $env:PCK_KEY
+if (-not $pckKey) {
+    Write-Host "ERROR: PCK_KEY not set. Create a .env file with PCK_KEY=your_key" -ForegroundColor Red
+    exit 1
+}
 $pckVersion = "2.4.3.0"
 $pckExplorer = "$gameDir\_tools\pckexplorer\GodotPCKExplorer.Console.exe"
 $srcDir = "$PSScriptRoot\..\src"

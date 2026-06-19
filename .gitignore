@@ -11,6 +11,9 @@ libgodotsteam.*.dll
 *.pck
 *.pck.orig
 
+# Environment (PCK key)
+.env
+
 # Godot editor artifacts (keep exported scenes)
 .godot/imported/
 .godot/global_script_class_cache.cfg
