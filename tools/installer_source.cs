@@ -74,19 +74,21 @@ public class Installer
         var psi = new ProcessStartInfo
         {
             FileName = pckExplorer,
-            Arguments = $"-pc \"{workPck}\" \"{modFilesDir}\" \"{workPck}\" 2.4.3.0 \"\" {pckKey} files",
+            Arguments = "-pc \"" + workPck + "\" \"" + modFilesDir + "\" \"" + workPck + "\" 2.4.3.0 \"\" " + pckKey + " files",
             CreateNoWindow = true,
             WindowStyle = ProcessWindowStyle.Hidden,
         };
-        using var proc = Process.Start(psi);
-        proc.WaitForExit();
-
-        if (proc.ExitCode != 0)
+        using (var proc = Process.Start(psi))
         {
-            Console.WriteLine($"ERROR: PCK patching failed (exit code {proc.ExitCode}).");
-            Console.Write("Press Enter to exit...");
-            Console.ReadLine();
-            return;
+            proc.WaitForExit();
+
+            if (proc.ExitCode != 0)
+            {
+                Console.WriteLine("ERROR: PCK patching failed (exit code " + proc.ExitCode + ").");
+                Console.Write("Press Enter to exit...");
+                Console.ReadLine();
+                return;
+            }
         }
 
         Console.WriteLine("Installing launcher...");
