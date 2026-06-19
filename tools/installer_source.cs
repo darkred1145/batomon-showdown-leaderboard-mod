@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32;
 
@@ -11,7 +12,9 @@ public class Installer
             Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
             "Batomon Showdown Leaderboard"
         );
-        string pckSource = Path.Combine(exeDir, "batomon_showdown.pck");
+        string modFilesDir = Path.Combine(exeDir, "mod_files");
+        string pckExplorer = Path.Combine(exeDir, "GodotPCKExplorer.Console.exe");
+        string pckKey = "PCK_KEY_PLACEHOLDER";
 
         Console.WriteLine("=== Batomon Showdown - Leaderboard Mod Installer ===");
         Console.WriteLine("");
@@ -21,6 +24,31 @@ public class Installer
         {
             Console.WriteLine("ERROR: Could not find Batomon Showdown.");
             Console.WriteLine("Make sure it's installed on Steam.");
+            Console.Write("Press Enter to exit...");
+            Console.ReadLine();
+            return;
+        }
+
+        if (!Directory.Exists(modFilesDir))
+        {
+            Console.WriteLine("ERROR: mod_files/ directory not found next to installer.");
+            Console.Write("Press Enter to exit...");
+            Console.ReadLine();
+            return;
+        }
+
+        if (!File.Exists(pckExplorer))
+        {
+            Console.WriteLine("ERROR: GodotPCKExplorer.Console.exe not found next to installer.");
+            Console.Write("Press Enter to exit...");
+            Console.ReadLine();
+            return;
+        }
+
+        string origPck = Path.Combine(steamDir, "batomon_showdown.pck");
+        if (!File.Exists(origPck))
+        {
+            Console.WriteLine("ERROR: Could not find batomon_showdown.pck in game directory.");
             Console.Write("Press Enter to exit...");
             Console.ReadLine();
             return;
@@ -38,8 +66,28 @@ public class Installer
         if (File.Exists(steamDll))
             File.Copy(steamDll, Path.Combine(modDir, "libgodotsteam.windows.template_release.x86_64.dll"), true);
 
-        Console.WriteLine("Installing modded PCK...");
-        File.Copy(pckSource, Path.Combine(modDir, "batomon_showdown.pck"), true);
+        Console.WriteLine("Copying original PCK...");
+        string workPck = Path.Combine(modDir, "batomon_showdown.pck");
+        File.Copy(origPck, workPck, true);
+
+        Console.WriteLine("Patching PCK with mod files...");
+        var psi = new ProcessStartInfo
+        {
+            FileName = pckExplorer,
+            Arguments = $"-pc \"{workPck}\" \"{modFilesDir}\" \"{workPck}\" 2.4.3.0 \"\" {pckKey} files",
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden,
+        };
+        using var proc = Process.Start(psi);
+        proc.WaitForExit();
+
+        if (proc.ExitCode != 0)
+        {
+            Console.WriteLine($"ERROR: PCK patching failed (exit code {proc.ExitCode}).");
+            Console.Write("Press Enter to exit...");
+            Console.ReadLine();
+            return;
+        }
 
         Console.WriteLine("Installing launcher...");
         string launcherSource = Path.Combine(exeDir, "Leaderboard Mod Launcher.exe");
@@ -57,7 +105,6 @@ public class Installer
 
     static string FindGameDir()
     {
-        // Check common Steam install paths
         string[] candidates = new string[]
         {
             @"C:\Program Files (x86)\Steam\steamapps\common\Batomon Showdown Demo",
@@ -70,7 +117,6 @@ public class Installer
                 return p;
         }
 
-        // Try registry to find Steam install
         try
         {
             string steamPath = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Valve\Steam", "InstallPath", "") as string;
@@ -79,12 +125,10 @@ public class Installer
 
             if (!string.IsNullOrEmpty(steamPath))
             {
-                // Check main steamapps
                 string main = Path.Combine(steamPath, "steamapps", "common", "Batomon Showdown Demo");
                 if (File.Exists(Path.Combine(main, "batomon_showdown.exe")))
                     return main;
 
-                // Check libraryfolders.vdf for additional libraries
                 string vdfPath = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
                 if (File.Exists(vdfPath))
                 {

@@ -10,12 +10,12 @@ Adds a leaderboard panel to the title screen showing your ranked tier, MMR, win 
 
 ## Installation
 
-1. Download `Leaderboard Mod Installer.exe` and `batomon_showdown.pck` from [Releases](https://github.com/darkred1145/batomon-showdown-leaderboard-mod/releases)
-2. Place both in the same folder, run the installer
-3. It creates `Desktop\Batomon Showdown Leaderboard\` with a portable copy
+1. Download the latest release from [Releases](https://github.com/darkred1145/batomon-showdown-leaderboard-mod/releases) and extract the zip
+2. Run `Leaderboard Mod Installer.exe`
+3. It copies the game from your Steam install, patches the PCK with mod files, and places everything on your desktop
 4. Launch from `Desktop\Batomon Showdown Leaderboard\Leaderboard Mod Launcher.exe`
 
-The original Steam install is never modified.
+The original Steam install is never modified. Only your source files (`.gd`, `.tscn`) are distributed — the game's copyrighted PCK is patched locally from your own copy.
 
 ## Building from source
 
@@ -38,7 +38,7 @@ copy .env.example .env
 ## Project structure
 
 ```
-├── src/
+├── src/                           # Mod source files (GDScript, scenes)
 │   ├── game/
 │   │   ├── states/
 │   │   │   ├── title_state.gd               # Adds Leaderboard button to title
@@ -53,13 +53,15 @@ copy .env.example .env
 │   ├── installer_source.cs                   # Installer EXE (C#)
 │   ├── launcher_source.cs                    # Game launcher EXE (C#)
 │   ├── Leaderboard Mod Launcher.exe          # Pre-built launcher
-│   └── build_mod.ps1                         # PCK build script
+│   └── build_mod.ps1                         # Local PCK build script
 ├── .env                        # Local PCK key (gitignored)
 ├── .env.example                 # Template for .env
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
+
+The release zip bundles `Leaderboard Mod Installer.exe`, `Leaderboard Mod Launcher.exe`, `GodotPCKExplorer.Console.exe`, and `mod_files/` (a copy of `src/`). The installer patches the game's PCK locally — no copyrighted assets are distributed.
 
 ## Features
 
