@@ -19,7 +19,7 @@ The original Steam install is never modified.
 
 ## Building from source
 
-Requires [GodotPCKExplorer](https://github.com/ValveSoftware/GodotPCKExplorer) (included at `_tools/pckexplorer/` after installing the demo).
+Requires [GodotPCKExplorer](https://github.com/DmitriySalnikov/GodotPCKExplorer) (included at `_tools/pckexplorer/` after installing the demo).
 
 ```powershell
 # One-time: back up the original PCK
