@@ -41,6 +41,10 @@ csc /target:winexe /reference:System.Windows.Forms.dll /out:"tools\Leaderboard M
 ```
 
 **Note:** `.env` is gitignored — your PCK key stays local. Never commit it to the repo.
+A pre-commit hook (`.githooks/pre-commit`) automatically blocks any commit containing the key. Enable it with:
+```powershell
+git config core.hooksPath .githooks
+```
 
 ## Project structure
 
