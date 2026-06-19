@@ -19,15 +19,21 @@ The original Steam install is never modified.
 
 ## Building from source
 
+Requires [GodotPCKExplorer](https://github.com/ValveSoftware/GodotPCKExplorer) (included at `_tools/pckexplorer/` after installing the demo).
+
 ```powershell
 # One-time: back up the original PCK
 copy "$gameDir\batomon_showdown.pck" "$gameDir\batomon_showdown.pck.orig"
+
+# One-time: create .env with your PCK key (see .env.example)
+copy .env.example .env
+# then edit .env and paste your key
 
 # Build
 .\tools\build_mod.ps1
 ```
 
-Requires [GodotPCKExplorer](https://github.com/ValveSoftware/GodotPCKExplorer) (included at `_tools/pckexplorer/` after installing the demo).
+**Note:** `.env` is gitignored — your PCK key stays local. Never commit it to the repo.
 
 ## Project structure
 
@@ -48,6 +54,8 @@ Requires [GodotPCKExplorer](https://github.com/ValveSoftware/GodotPCKExplorer) (
 │   ├── launcher_source.cs                    # Game launcher EXE (C#)
 │   ├── Leaderboard Mod Launcher.exe          # Pre-built launcher
 │   └── build_mod.ps1                         # PCK build script
+├── .env                        # Local PCK key (gitignored)
+├── .env.example                 # Template for .env
 ├── .gitignore
 ├── LICENSE
 └── README.md
