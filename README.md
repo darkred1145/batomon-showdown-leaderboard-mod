@@ -29,8 +29,15 @@ copy "$gameDir\batomon_showdown.pck" "$gameDir\batomon_showdown.pck.orig"
 copy .env.example .env
 # then edit .env and paste your key
 
-# Build
+# Build mod PCK (patches .pck with src/ files)
 .\tools\build_mod.ps1
+
+# (Optional) Rebuild installer/launcher
+$key = ((Get-Content .env) -match "^PCK_KEY=") -split "=",2 |% { $_[1].Trim() }
+$src = (Get-Content tools\installer_source.cs -Raw) -replace "PCK_KEY_PLACEHOLDER", $key
+$src | Set-Content "$env:TEMP\installer.cs" -Encoding ASCII
+csc /target:exe /out:"tools\Leaderboard Mod Installer.exe" "$env:TEMP\installer.cs"
+csc /target:winexe /reference:System.Windows.Forms.dll /out:"tools\Leaderboard Mod Launcher.exe" tools\launcher_source.cs
 ```
 
 **Note:** `.env` is gitignored — your PCK key stays local. Never commit it to the repo.
@@ -50,9 +57,10 @@ copy .env.example .env
 │   └── .godot/exported/.../
 │       └── export-*leaderboard_panel.scn     # Compiled scene
 ├── tools/
-│   ├── installer_source.cs                   # Installer EXE (C#)
-│   ├── launcher_source.cs                    # Game launcher EXE (C#)
-│   ├── Leaderboard Mod Launcher.exe          # Pre-built launcher
+│   ├── installer_source.cs                   # Installer source (C#)
+│   ├── launcher_source.cs                    # Launcher source (C#)
+│   ├── Leaderboard Mod Installer.exe         # Compiled installer
+│   ├── Leaderboard Mod Launcher.exe          # Compiled launcher
 │   └── build_mod.ps1                         # Local PCK build script
 ├── .env                        # Local PCK key (gitignored)
 ├── .env.example                 # Template for .env
