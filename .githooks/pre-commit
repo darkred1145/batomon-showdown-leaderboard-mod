@@ -1,0 +1,19 @@
+#!/bin/sh
+# Pre-commit hook: block commits containing the PCK encryption key
+pattern="[A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9][A-F0-9]"
+blocked=0
+for f in $(git diff --cached --name-only --diff-filter=ACMR); do
+    if [ "$f" != ".env" ]; then
+        content=$(git show ":$f" 2>/dev/null)
+        if echo "$content" | grep -Eq "$pattern"; then
+            echo "[BLOCKED] Commit contains PCK encryption key in $f"
+            blocked=1
+        fi
+    fi
+done
+if [ "$blocked" = "1" ]; then
+    echo ""
+    echo "PCK_KEY detected in staged files. Remove it before committing."
+    echo "The key belongs in .env only (which is gitignored)."
+    exit 1
+fi
