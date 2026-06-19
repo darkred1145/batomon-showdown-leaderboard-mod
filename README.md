@@ -73,7 +73,7 @@ git config core.hooksPath .githooks
 └── README.md
 ```
 
-The release zip bundles `Leaderboard Mod Installer.exe`, `Leaderboard Mod Launcher.exe`, `GodotPCKExplorer.Console.exe`, and `mod_files/` (a copy of `src/`). The installer patches the game's PCK locally — no copyrighted assets are distributed.
+The release zip bundles `Leaderboard Mod Installer.exe`, `Leaderboard Mod Launcher.exe`, `GodotPCKExplorer.Console.exe`, `mbedTLS/`, and `mod_files/` (a copy of `src/`). The installer patches the game's PCK locally — no copyrighted assets are distributed.
 
 ## Features
 
