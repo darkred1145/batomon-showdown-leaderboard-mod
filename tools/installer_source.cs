@@ -71,10 +71,11 @@ public class Installer
         File.Copy(origPck, workPck, true);
 
         Console.WriteLine("Patching PCK with mod files...");
+        string patchedPck = Path.Combine(modDir, "batomon_showdown_patched.pck");
         var psi = new ProcessStartInfo
         {
             FileName = pckExplorer,
-            Arguments = "-pc \"" + workPck + "\" \"" + modFilesDir + "\" \"" + workPck + "\" 2.4.3.0 \"\" " + pckKey + " files",
+            Arguments = "-pc \"" + workPck + "\" \"" + modFilesDir + "\" \"" + patchedPck + "\" 2.4.3.0 \"\" " + pckKey + " files",
             CreateNoWindow = true,
             WindowStyle = ProcessWindowStyle.Hidden,
         };
@@ -90,6 +91,9 @@ public class Installer
                 return;
             }
         }
+
+        File.Delete(workPck);
+        File.Move(patchedPck, workPck);
 
         Console.WriteLine("Installing launcher...");
         string launcherSource = Path.Combine(exeDir, "Leaderboard Mod Launcher.exe");
